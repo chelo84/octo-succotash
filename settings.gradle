@@ -1,0 +1,8 @@
+rootProject.name = 'octo-succotash'
+include 'map-generator'
+include 'core'
+include 'lib'
+include 'audio-player'
+include 'guild-data'
+include 'weather'
+
