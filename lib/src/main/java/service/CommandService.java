@@ -1,12 +1,20 @@
-package listener.message;
+package service;
 
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import listener.EventListener;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface MessageEventListener extends EventListener<MessageCreateEvent> {
-    String getCommand();
+import java.lang.reflect.Method;
+
+public interface CommandService extends Service {
+    @Getter
+    @RequiredArgsConstructor
+    class CommandAndMethod {
+        private final Class<? extends CommandService> clazz;
+        private final Method method;
+    }
 
     default Flux<String> getArguments(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getMessage().getContent())

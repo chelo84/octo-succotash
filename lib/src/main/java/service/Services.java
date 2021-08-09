@@ -17,6 +17,17 @@ public final class Services {
     @SuppressWarnings("rawtypes")
     private final static Map<Class<?>, ServiceLoader> serviceLoaderByClass = new HashMap<>();
 
+    public static <T extends Service, S extends Service> T getService(Class<T> type, Class<S> subtype) {
+        ServiceLoader<T> serviceLoader = getOrLoadServiceLoader(type);
+        for (T service : serviceLoader) {
+            if (service != null && service.getClass() == subtype) {
+                return service;
+            }
+        }
+
+        throw new RuntimeException(format("Service {0} -> {1} not found", type.getSimpleName(), subtype.getSimpleName()));
+    }
+
     public static <T extends Service> T getService(Class<T> clazz) {
         ServiceLoader<T> serviceLoader = getOrLoadServiceLoader(clazz);
         for (T service : serviceLoader) {
@@ -25,7 +36,7 @@ public final class Services {
             }
         }
 
-        throw new RuntimeException(format("Service {0} not found", clazz.getName()));
+        throw new RuntimeException(format("Service {0} not found", clazz.getSimpleName()));
     }
 
     public static <T extends Service> List<T> getAll(Class<T> clazz) {

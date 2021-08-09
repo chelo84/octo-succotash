@@ -1,6 +1,0 @@
-listener.message.PingPongEventListener
-listener.message.JoinEventListener
-listener.message.LeaveEventListener
-listener.message.PlayEventListener
-listener.message.SkipEventListener
-listener.message.VolumeEventListener
