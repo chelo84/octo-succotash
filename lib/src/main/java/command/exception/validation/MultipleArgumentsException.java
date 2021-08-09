@@ -1,6 +1,6 @@
 package command.exception.validation;
 
-import service.CommandService;
+import spi.CommandService;
 
 import java.lang.reflect.Method;
 

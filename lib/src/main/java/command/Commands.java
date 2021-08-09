@@ -7,8 +7,8 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
-import service.CommandService;
-import service.Services;
+import spi.CommandService;
+import spi.Services;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;

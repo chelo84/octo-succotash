@@ -6,7 +6,7 @@ import openweather.OpenWeatherApiResponse;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import rest.HttpClientResponseHandler;
-import service.CommandService;
+import spi.CommandService;
 
 import static java.text.MessageFormat.format;
 

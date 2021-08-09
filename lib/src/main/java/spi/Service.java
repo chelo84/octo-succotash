@@ -1,4 +1,4 @@
-package service;
+package spi;
 
 public interface Service {
 }

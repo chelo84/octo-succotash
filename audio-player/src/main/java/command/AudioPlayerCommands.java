@@ -9,17 +9,13 @@ import discord4j.voice.VoiceConnection;
 import guild.AudioPlayerGuildData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import service.CommandService;
-import util.MessageUtils;
+import spi.CommandService;
+
+import java.util.function.Consumer;
 
 import static util.MessageUtils.createMessageAndSend;
 
 public class AudioPlayerCommands implements CommandService {
-
-    @Command("test")
-    public Mono<?> test(MessageCreateEvent event) {
-        return MessageUtils.createMessage(event.getMessage().getChannel(), "Pong!");
-    }
 
     @Command("join")
     public Mono<?> join(MessageCreateEvent event) {
@@ -68,23 +64,31 @@ public class AudioPlayerCommands implements CommandService {
     }
 
     @Command("volume")
-    public Mono<?> execute(MessageCreateEvent event) {
+    public Mono<?> volume(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
                 .map(AudioPlayerGuildData::getInstance)
                 .flatMap(audioPlayerGD -> this.getArguments(event)
-                        .switchIfEmpty(Flux.defer(() -> {
-                            createMessageAndSend(event.getMessage().getChannel(), "Volume is set to {0}", audioPlayerGD.getPlayer().getVolume());
-                            return Flux.empty();
-                        }))
+                        .switchIfEmpty(sendVolumeMessage(event, audioPlayerGD))
                         .map(Integer::parseInt)
-                        .doOnNext(volume -> {
-                            createMessageAndSend(event.getMessage().getChannel(), "Setting volume to {0}...", volume);
-                            audioPlayerGD.getPlayer().setVolume(volume);
-                        })
+                        .doOnNext(setVolume(event, audioPlayerGD))
                         .then()
                 ).onErrorResume(
                         NumberFormatException.class,
                         (ex) -> createMessageAndSend(event.getMessage().getChannel(), "Please provide an integer value")
                 );
+    }
+
+    private Consumer<Integer> setVolume(MessageCreateEvent event, AudioPlayerGuildData audioPlayerGD) {
+        return volume -> {
+            createMessageAndSend(event.getMessage().getChannel(), "Setting volume to {0}...", volume);
+            audioPlayerGD.getPlayer().setVolume(volume);
+        };
+    }
+
+    private Flux<String> sendVolumeMessage(MessageCreateEvent event, AudioPlayerGuildData audioPlayerGD) {
+        return Flux.defer(() -> {
+            createMessageAndSend(event.getMessage().getChannel(), "Volume is set to {0}", audioPlayerGD.getPlayer().getVolume());
+            return Flux.empty();
+        });
     }
 }

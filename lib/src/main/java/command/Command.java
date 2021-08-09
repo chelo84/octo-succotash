@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.With;
 import reactor.core.publisher.Mono;
-import service.CommandService;
+import spi.CommandService;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
