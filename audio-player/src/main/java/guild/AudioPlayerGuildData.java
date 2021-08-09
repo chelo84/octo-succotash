@@ -1,7 +1,6 @@
 package guild;
 
 import audio.provider.LavaPlayerAudioProvider;
-import audio.track.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -16,7 +15,6 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
 
 import static java.util.Objects.isNull;
 
@@ -54,7 +52,7 @@ public class AudioPlayerGuildData extends GuildData {
     }
 
     private AudioProvider createAudioProvider(AudioPlayer player) {
-        return new LavaPlayerAudioProvider( player );
+        return new LavaPlayerAudioProvider(player);
     }
 
     public static AudioPlayerGuildData getInstance(Snowflake snowflake) {

@@ -8,13 +8,10 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import discord4j.core.object.entity.channel.MessageChannel;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
-import util.MessageUtils;
 
 import java.util.LinkedList;
-import java.util.Queue;
 
 import static java.text.MessageFormat.format;
-import static util.MessageUtils.createMessage;
 import static util.MessageUtils.createMessageAndSend;
 
 @RequiredArgsConstructor

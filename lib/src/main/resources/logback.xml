@@ -5,7 +5,7 @@
     <logger name="io.netty" level="INFO"/>
     <logger name="reactor" level="INFO"/>
     <logger name="discord4j" level="INFO"/>
-<!--    <logger name="discord4j.rest.request" level="info"/>-->
+    <!--    <logger name="discord4j.rest.request" level="info"/>-->
 
     <!-- Display the logs in your console with the following format -->
     <!-- You can learn more about this here: https://logback.qos.ch/manual/layouts.html#ClassicPatternLayout -->

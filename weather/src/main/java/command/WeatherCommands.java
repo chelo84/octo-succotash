@@ -1,5 +1,6 @@
 package command;
 
+import command.annotation.Command;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import openweather.OpenWeatherApiResponse;
 import reactor.core.publisher.Mono;

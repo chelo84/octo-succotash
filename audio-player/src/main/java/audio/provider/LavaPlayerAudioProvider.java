@@ -15,7 +15,7 @@ public class LavaPlayerAudioProvider extends AudioProvider {
     private final MutableAudioFrame frame = new MutableAudioFrame();
 
     public LavaPlayerAudioProvider(final AudioPlayer player) {
-        super( ByteBuffer.allocate( StandardAudioDataFormats.DISCORD_OPUS.maximumChunkSize() ) );
+        super(ByteBuffer.allocate(StandardAudioDataFormats.DISCORD_OPUS.maximumChunkSize()));
 
         frame.setBuffer(getBuffer());
         this.player = player;
