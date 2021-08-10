@@ -14,13 +14,9 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 @RequiredArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MainDto {
-    @JsonProperty("temp")
-    double temp;
-    @JsonProperty("feels_like")
-    double feelsLike;
-    @JsonProperty("temp_min")
-    double tempMin;
-    @JsonProperty("temp_max")
-    double tempMax;
+public class OpenWeatherApiError {
+    @JsonProperty("cod")
+    String cod;
+    @JsonProperty("message")
+    String message;
 }
