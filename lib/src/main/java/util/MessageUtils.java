@@ -8,12 +8,12 @@ import static java.text.MessageFormat.format;
 
 public final class MessageUtils {
 
-    public static Mono<Void> createMessageAndSend(Mono<MessageChannel> channelMono, String message) {
+    public static <T> Mono<T> createMessageAndSend(Mono<MessageChannel> channelMono, String message) {
         channelMono.flatMap(channel -> channel.createMessage(message)).subscribe();
         return Mono.empty();
     }
 
-    public static Mono<Void> createMessageAndSend(Mono<MessageChannel> channelMono, String message, Object... messageArguments) {
+    public static <T> Mono<T> createMessageAndSend(Mono<MessageChannel> channelMono, String message, Object... messageArguments) {
         channelMono.flatMap(channel -> channel.createMessage(format(message, messageArguments))).subscribe();
         return Mono.empty();
     }

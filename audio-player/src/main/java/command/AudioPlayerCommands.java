@@ -3,6 +3,7 @@ package command;
 import audio.track.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import command.annotation.Command;
+import command.annotation.CommandArg;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.voice.VoiceConnection;
@@ -13,11 +14,16 @@ import spi.CommandService;
 
 import java.util.function.Consumer;
 
+import static command.annotation.CommandArg.ArgType.INTEGER;
+import static command.annotation.CommandArg.ArgType.TEXT;
 import static util.MessageUtils.createMessageAndSend;
 
 public class AudioPlayerCommands implements CommandService {
 
-    @Command("join")
+    @Command(
+            value = "join",
+            description = "Tells the bot to join the voice channel"
+    )
     public Mono<?> join(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
                 .map(AudioPlayerGuildData::getInstance)
@@ -32,7 +38,10 @@ public class AudioPlayerCommands implements CommandService {
                 });
     }
 
-    @Command("leave")
+    @Command(
+            value = "leave",
+            description = "Tells the bot to leave the voice channel"
+    )
     public Mono<?> leave(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getMember())
                 .flatMap(Member::getVoiceState)
@@ -42,7 +51,11 @@ public class AudioPlayerCommands implements CommandService {
                 .flatMap(VoiceConnection::disconnect);
     }
 
-    @Command("play")
+    @Command(
+            value = "play",
+            args = @CommandArg(value = "song", type = TEXT),
+            description = "Plays a song"
+    )
     public Mono<?> play(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
                 .map(AudioPlayerGuildData::getInstance)
@@ -55,7 +68,10 @@ public class AudioPlayerCommands implements CommandService {
                 );
     }
 
-    @Command("skip")
+    @Command(
+            value = "skip",
+            description = "Skips the current song"
+    )
     public Mono<?> skip(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
                 .map(AudioPlayerGuildData::getInstance)
@@ -63,7 +79,11 @@ public class AudioPlayerCommands implements CommandService {
                 .doOnNext(AudioPlayer::stopTrack);
     }
 
-    @Command("volume")
+    @Command(
+            value = "volume",
+            args = @CommandArg(value = "newVolume", type = INTEGER, required = false),
+            description = "If newVolume is present, sets the new volume, otherwise returns the current volume"
+    )
     public Mono<?> volume(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
                 .map(AudioPlayerGuildData::getInstance)

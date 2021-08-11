@@ -1,4 +1,4 @@
-package command.exception.validation;
+package command;
 
 import spi.CommandService;
 

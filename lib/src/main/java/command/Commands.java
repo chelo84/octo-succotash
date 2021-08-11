@@ -1,14 +1,15 @@
 package command;
 
-import command.exception.CommandsAlreadyRegisteredException;
-import command.exception.CommandsNotRegisteredException;
-import command.exception.validation.CommandAlreadyBoundException;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import spi.CommandService;
 import spi.Services;
+import util.MessageUtils;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ public final class Commands {
 
     public static final Character COMMAND_PREFIX = '>';
     private static Commands instance;
+    @Getter
     private final Set<Command> commands = new HashSet<>();
 
     private Commands() {
@@ -53,6 +55,7 @@ public final class Commands {
                                 .flatMap(command -> runCommand(command, event))
                                 .then()
                         )
+                        .onErrorResume(InvalidArgumentsException.class, (ex) -> MessageUtils.createMessageAndSend(event.getMessage().getChannel(), ex.getMessage()))
                 )
                 .subscribe(null, e -> log.error(e.getMessage(), e));
     }
@@ -60,7 +63,11 @@ public final class Commands {
     private static Mono<?> runCommand(Command command, MessageCreateEvent event) {
         try {
             var service = Services.getService(CommandService.class, command.getService());
-            return (Mono<?>) command.getMethod().invoke(service, event);
+            Flux<String> arguments = Mono.justOrEmpty(event.getMessage().getContent())
+                    .flatMapMany(content -> Flux.fromArray(content.split(" ")))
+                    .skip(1)
+                    .filter(StringUtils::isNotBlank);
+            return (Mono<?>) command.getMethod().invoke(service, event, arguments);
         } catch (Exception e) {
             return Mono.error(e);
         }

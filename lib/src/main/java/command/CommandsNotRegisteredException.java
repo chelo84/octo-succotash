@@ -1,4 +1,4 @@
-package command.exception;
+package command;
 
 public class CommandsNotRegisteredException extends RuntimeException {
     public CommandsNotRegisteredException() {

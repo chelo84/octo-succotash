@@ -1,6 +1,4 @@
-package command.exception.validation;
-
-import command.Command;
+package command;
 
 public class CommandAlreadyBoundException extends CommandValidationException {
     public CommandAlreadyBoundException(Command command) {
