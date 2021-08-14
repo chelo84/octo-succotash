@@ -4,10 +4,20 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 public @interface CommandArg {
+    /**
+     * Argument's name
+     */
     String value();
 
+    /**
+     * Argument's type
+     */
     ArgType type() default ArgType.UNDEFINED;
 
+    /**
+     * Whether it is required or not <br>
+     * default: true
+     */
     boolean required() default true;
 
     @RequiredArgsConstructor
