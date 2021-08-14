@@ -26,7 +26,7 @@ public final class Commands {
     public static final Character COMMAND_PREFIX = '>';
     private static Commands instance;
     @Getter
-    private final Set<Command> commands = new HashSet<>();
+    private final Set<Cmd> commands = new HashSet<>();
 
     private Commands() {
         doRegisterCommands();
@@ -60,7 +60,7 @@ public final class Commands {
                 .subscribe(null, e -> log.error(e.getMessage(), e));
     }
 
-    private static Mono<?> runCommand(Command command, MessageCreateEvent event) {
+    private static Mono<?> runCommand(Cmd command, MessageCreateEvent event) {
         try {
             var service = Services.getService(CommandService.class, command.getService());
             Flux<String> arguments = Mono.justOrEmpty(event.getMessage().getContent())
@@ -78,7 +78,7 @@ public final class Commands {
 
         for (CommandService service : services) {
             for (Method method : service.getClass().getMethods()) {
-                final Command command = Command.create(service, method);
+                final Cmd command = Cmd.create(service, method);
 
                 if (nonNull(command)) {
                     commands.add(Optional.of(command)
@@ -89,7 +89,7 @@ public final class Commands {
         }
     }
 
-    public Mono<Command> getCommand(String text) {
+    public Mono<Cmd> getCommand(String text) {
         return Mono.justOrEmpty(this.commands.parallelStream()
                 .filter(it -> it.getCommand().equalsIgnoreCase(text.split(" ")[0].replaceFirst(Commands.COMMAND_PREFIX.toString(), "")))
                 .findFirst());

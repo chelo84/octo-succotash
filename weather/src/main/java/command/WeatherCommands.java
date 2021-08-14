@@ -1,6 +1,7 @@
 package command;
 
 import command.annotation.Command;
+import command.annotation.CommandArg;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -28,8 +29,9 @@ public class WeatherCommands implements CommandService {
     private final String API_URL = "http://api.openweathermap.org";
     private final BiConsumer<OpenWeatherApiResponse, EmbedCreateSpec> template = (resp, spec) -> {
         var weather = resp.getWeather().stream().findFirst();
+        final String OPEN_WEATHER_MAP_URL = "http://openweathermap.org";
         spec.setColor(Color.RED)
-                .setAuthor(resp.getName() + " - " + resp.getSys().getCountry().toUpperCase(), null, format(API_URL + "/img/wn/{0}.png", weather.map(Weather::getIcon).orElse(EMPTY)))
+                .setAuthor(resp.getName() + " - " + resp.getSys().getCountry().toUpperCase(), null, format(OPEN_WEATHER_MAP_URL + "/img/wn/{0}@2x.png", weather.map(Weather::getIcon).orElse(EMPTY)))
                 .setTitle(
                         weather.map(Weather::getDescription)
                                 .map(WordUtils::capitalize)
@@ -40,7 +42,11 @@ public class WeatherCommands implements CommandService {
                 .addField("Max.", Math.round(resp.getMain().getTempMax()) + "\u00B0C\n", true);
     };
 
-    @Command("weather")
+    @Command(
+            value = "weather",
+            description = "Get the current weather information",
+            args = {@CommandArg(value = "city", type = CommandArg.ArgType.TEXT)}
+    )
     public Mono<?> weather(MessageCreateEvent event, Flux<String> arguments) {
         HttpClient httpClient = event.getClient().rest().getRestResources().getReactorResources().getHttpClient();
         return arguments.switchIfEmpty(Mono.error(new InvalidArgumentsException("Please provide the arguments to search")))

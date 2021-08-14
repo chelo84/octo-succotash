@@ -82,7 +82,7 @@ public class AudioPlayerCommands implements CommandService {
     @Command(
             value = "volume",
             args = @CommandArg(value = "newVolume", type = INTEGER, required = false),
-            description = "If newVolume is present, sets the new volume, otherwise returns the current volume"
+            description = "newVolume absent: current volume\nnewVolume present: set the volume"
     )
     public Mono<?> volume(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())

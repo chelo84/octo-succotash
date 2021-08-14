@@ -9,6 +9,8 @@ import reactor.core.publisher.Mono;
 import spi.CommandService;
 import util.MessageUtils;
 
+import java.time.Instant;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,17 +33,31 @@ public class OtherCommands implements CommandService {
             description = "Commands info"
     )
     public Mono<?> help(MessageCreateEvent event, Flux<String> arguments) {
-        Set<command.Command> commands = Commands.getInstance().getCommands();
+        Set<Cmd> commands = Commands.getInstance().getCommands();
         return arguments.collectList()
                 .flatMap(args -> {
                     if (args.isEmpty()) {
                         return event.getMessage().getChannel()
-                                .flatMap(channel -> channel.createMessage(spec -> spec.setContent(commands.stream()
-                                        .map(command.Command::getCommand)
+                                .flatMap(channel -> channel.createMessage(spec -> spec.setContent("Commands: " + commands.stream()
+                                        .map(Cmd::getCommand)
                                         .collect(Collectors.joining(", "))
                                 )));
                     } else {
-                        return MessageUtils.createMessage(event.getMessage().getChannel(), "a");
+                        Optional<Cmd> command = commands.parallelStream()
+                                .filter(c -> c.getCommand().equalsIgnoreCase(args.get(0)))
+                                .findFirst();
+                        if (command.isEmpty())
+                            return Mono.error(new InvalidArgumentsException("Argument " + args.get(0) + " not valid"));
+
+                        return event.getMessage().getChannel()
+                                .flatMap(channel -> channel.createEmbed(spec ->
+                                        spec.setTitle("Command info")
+                                                .addField("Command", command.map(Cmd::getCommand).orElse("No name"), true)
+                                                .addField("Description", command.map(Cmd::getDescription).orElse("No description"), false)
+                                                .addField("Example", command.map(Cmd::getExample).orElse("No example"), false)
+                                                .setFooter("<> required | () optional", null)
+                                                .setTimestamp(Instant.now()))
+                                );
                     }
                 });
     }
