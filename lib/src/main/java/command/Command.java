@@ -1,5 +1,6 @@
 package command;
 
+import event.annotation.OnMessage;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-import static command.annotation.CommandArg.ArgType.UNDEFINED;
+import static event.annotation.MessageArgument.ArgType.UNDEFINED;
 import static java.text.MessageFormat.format;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -24,7 +25,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Builder
 @ToString
 @RequiredArgsConstructor
-public class Cmd {
+public class Command {
 
     String command;
     Class<? extends CommandService> service;
@@ -32,20 +33,20 @@ public class Cmd {
     String description;
     String example;
 
-    public static Cmd create(CommandService service, Method method) {
-        command.annotation.Command commandAnn = method.getAnnotation(command.annotation.Command.class);
-        if (commandAnn == null)
+    public static Command create(CommandService service, Method method) {
+        OnMessage onMessage = method.getAnnotation(OnMessage.class);
+        if (onMessage == null)
             return null;
-        else if (commandAnn.value().equals(""))
+        else if (onMessage.value().equals(""))
             throw new CommandValidationException("Command does not have a value", service.getClass(), method);
 
-        final String commandValue = commandAnn.value().trim();
-        final String commandDescription = isNotBlank(commandAnn.description()) ? commandAnn.description() : null;
-        final String commandExample = createExample(commandAnn);
+        final String commandValue = onMessage.value().trim();
+        final String commandDescription = isNotBlank(onMessage.description()) ? onMessage.description() : null;
+        final String commandExample = createExample(onMessage);
 
         validateCommand(service, method, commandValue);
 
-        return Cmd.builder()
+        return Command.builder()
                 .command(commandValue)
                 .service(service.getClass())
                 .method(method)
@@ -67,6 +68,7 @@ public class Cmd {
     /**
      * Checks whether the second argument of the method is equal to Flux&lt;String&gt;
      */
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private static boolean isSecondArgAFluxOfString(Method method) {
         Optional<Type> rawType = Optional.empty();
         Optional<Type> genericType = Optional.empty();
@@ -85,13 +87,13 @@ public class Cmd {
     /**
      * Create an example of the command like "<i>(PREFIX)</i><strong>help</strong> &lt;<strong>command</strong>:<strong>text</strong>&gt;"
      *
-     * @param commandAnn The command annotation
+     * @param onMessageAnn The command annotation
      * @return String containing the command's example
      */
-    private static String createExample(command.annotation.Command commandAnn) {
-        StringBuilder sb = new StringBuilder(format("{0}{1}", Commands.COMMAND_PREFIX, commandAnn.value()));
+    private static String createExample(OnMessage onMessageAnn) {
+        StringBuilder sb = new StringBuilder(format("{0}{1}", Commands.COMMAND_PREFIX, onMessageAnn.value()));
 
-        Arrays.stream(commandAnn.args())
+        Arrays.stream(onMessageAnn.args())
                 .filter(Objects::nonNull)
                 .forEach(it -> sb.append(" ")
                         .append(it.required() ? "<" : "(")
@@ -106,7 +108,7 @@ public class Cmd {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Cmd command1 = (Cmd) o;
+        Command command1 = (Command) o;
         return getCommand().equals(command1.getCommand());
     }
 

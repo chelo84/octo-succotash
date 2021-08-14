@@ -1,11 +1,11 @@
-package command.annotation;
+package event.annotation;
 
 import java.lang.annotation.*;
 
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Command {
+public @interface OnMessage {
     /**
      * Command's name
      */
@@ -19,5 +19,5 @@ public @interface Command {
     /**
      * Command's arguments
      */
-    CommandArg[] args() default {};
+    MessageArgument[] args() default {};
 }

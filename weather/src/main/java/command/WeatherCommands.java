@@ -1,7 +1,7 @@
 package command;
 
-import command.annotation.Command;
-import command.annotation.CommandArg;
+import event.annotation.OnMessage;
+import event.annotation.MessageArgument;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
@@ -42,10 +42,10 @@ public class WeatherCommands implements CommandService {
                 .addField("Max.", Math.round(resp.getMain().getTempMax()) + "\u00B0C\n", true);
     };
 
-    @Command(
+    @OnMessage(
             value = "weather",
             description = "Get the current weather information",
-            args = {@CommandArg(value = "city", type = CommandArg.ArgType.TEXT)}
+            args = {@MessageArgument(value = "city", type = MessageArgument.ArgType.TEXT)}
     )
     public Mono<?> weather(MessageCreateEvent event, Flux<String> arguments) {
         HttpClient httpClient = event.getClient().rest().getRestResources().getReactorResources().getHttpClient();

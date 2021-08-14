@@ -1,9 +1,9 @@
-package command.annotation;
+package event.annotation;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-public @interface CommandArg {
+public @interface MessageArgument {
     /**
      * Argument's name
      */

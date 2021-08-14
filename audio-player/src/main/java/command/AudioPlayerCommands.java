@@ -2,8 +2,8 @@ package command;
 
 import audio.track.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import command.annotation.Command;
-import command.annotation.CommandArg;
+import event.annotation.OnMessage;
+import event.annotation.MessageArgument;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.voice.VoiceConnection;
@@ -14,13 +14,13 @@ import spi.CommandService;
 
 import java.util.function.Consumer;
 
-import static command.annotation.CommandArg.ArgType.INTEGER;
-import static command.annotation.CommandArg.ArgType.TEXT;
+import static event.annotation.MessageArgument.ArgType.INTEGER;
+import static event.annotation.MessageArgument.ArgType.TEXT;
 import static util.MessageUtils.createMessageAndSend;
 
 public class AudioPlayerCommands implements CommandService {
 
-    @Command(
+    @OnMessage(
             value = "join",
             description = "Tells the bot to join the voice channel"
     )
@@ -38,7 +38,7 @@ public class AudioPlayerCommands implements CommandService {
                 });
     }
 
-    @Command(
+    @OnMessage(
             value = "leave",
             description = "Tells the bot to leave the voice channel"
     )
@@ -51,9 +51,9 @@ public class AudioPlayerCommands implements CommandService {
                 .flatMap(VoiceConnection::disconnect);
     }
 
-    @Command(
+    @OnMessage(
             value = "play",
-            args = @CommandArg(value = "song", type = TEXT),
+            args = @MessageArgument(value = "song", type = TEXT),
             description = "Plays a song"
     )
     public Mono<?> play(MessageCreateEvent event) {
@@ -68,7 +68,7 @@ public class AudioPlayerCommands implements CommandService {
                 );
     }
 
-    @Command(
+    @OnMessage(
             value = "skip",
             description = "Skips the current song"
     )
@@ -79,9 +79,9 @@ public class AudioPlayerCommands implements CommandService {
                 .doOnNext(AudioPlayer::stopTrack);
     }
 
-    @Command(
+    @OnMessage(
             value = "volume",
-            args = @CommandArg(value = "newVolume", type = INTEGER, required = false),
+            args = @MessageArgument(value = "newVolume", type = INTEGER, required = false),
             description = "newVolume absent: current volume\nnewVolume present: set the volume"
     )
     public Mono<?> volume(MessageCreateEvent event) {
