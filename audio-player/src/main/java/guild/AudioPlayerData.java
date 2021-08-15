@@ -19,20 +19,17 @@ import java.util.Map;
 import static java.util.Objects.isNull;
 
 @Getter
-public class AudioPlayerGuildData extends GuildData {
-    private static final Map<Snowflake, AudioPlayerGuildData> gdMap = new HashMap<>();
+public class AudioPlayerData {
 
     private final AudioPlayerManager manager;
     private final AudioPlayer player;
     private final AudioProvider provider;
     private final LinkedList<AudioTrack> trackQueue = new LinkedList<>();
 
-    public AudioPlayerGuildData(Snowflake snowflake) {
+    public AudioPlayerData() {
         manager = createAudioPlayerManager();
         player = createAudioPlayer(manager);
         provider = createAudioProvider(player);
-
-        gdMap.put(snowflake, this);
     }
 
     private AudioPlayerManager createAudioPlayerManager() {
@@ -53,14 +50,5 @@ public class AudioPlayerGuildData extends GuildData {
 
     private AudioProvider createAudioProvider(AudioPlayer player) {
         return new LavaPlayerAudioProvider(player);
-    }
-
-    public static AudioPlayerGuildData getInstance(Snowflake snowflake) {
-        AudioPlayerGuildData guildData = gdMap.get(snowflake);
-        if (isNull(guildData)) {
-            return new AudioPlayerGuildData(snowflake);
-        }
-
-        return guildData;
     }
 }

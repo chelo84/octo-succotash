@@ -7,7 +7,8 @@ import discord4j.core.object.entity.Member;
 import discord4j.voice.VoiceConnection;
 import event.annotation.MessageArgument;
 import event.annotation.OnMessage;
-import guild.AudioPlayerGuildData;
+import guild.AudioPlayerData;
+import guild.AudioPlayerDataFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import spi.CommandService;
@@ -26,7 +27,7 @@ public class AudioPlayerMessageCommands implements CommandService {
     )
     public Mono<?> join(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
-                .map(AudioPlayerGuildData::getInstance)
+                .map(AudioPlayerDataFactory::byGuild)
                 .zipWith(
                         Mono.justOrEmpty(event.getMember()).flatMap(Member::getVoiceState)
                 )
@@ -58,7 +59,7 @@ public class AudioPlayerMessageCommands implements CommandService {
     )
     public Mono<?> play(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
-                .map(AudioPlayerGuildData::getInstance)
+                .map(AudioPlayerDataFactory::byGuild)
                 .flatMap(audioPlayerGD -> this.getArguments(event, "Send audio after the command")
                         .doOnNext(arg -> {
                             final TrackScheduler scheduler = new TrackScheduler(audioPlayerGD.getPlayer(), audioPlayerGD.getTrackQueue(), event.getMessage().getChannel());
@@ -74,8 +75,8 @@ public class AudioPlayerMessageCommands implements CommandService {
     )
     public Mono<?> skip(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
-                .map(AudioPlayerGuildData::getInstance)
-                .map(AudioPlayerGuildData::getPlayer)
+                .map(AudioPlayerDataFactory::byGuild)
+                .map(AudioPlayerData::getPlayer)
                 .doOnNext(AudioPlayer::stopTrack);
     }
 
@@ -86,7 +87,7 @@ public class AudioPlayerMessageCommands implements CommandService {
     )
     public Mono<?> volume(MessageCreateEvent event) {
         return Mono.justOrEmpty(event.getGuildId())
-                .map(AudioPlayerGuildData::getInstance)
+                .map(AudioPlayerDataFactory::byGuild)
                 .flatMap(audioPlayerGD -> this.getArguments(event)
                         .switchIfEmpty(sendVolumeMessage(event, audioPlayerGD))
                         .map(Integer::parseInt)
@@ -98,14 +99,14 @@ public class AudioPlayerMessageCommands implements CommandService {
                 );
     }
 
-    private Consumer<Integer> setVolume(MessageCreateEvent event, AudioPlayerGuildData audioPlayerGD) {
+    private Consumer<Integer> setVolume(MessageCreateEvent event, AudioPlayerData audioPlayerGD) {
         return volume -> {
             createMessageAndSend(event.getMessage().getChannel(), "Setting volume to {0}...", volume);
             audioPlayerGD.getPlayer().setVolume(volume);
         };
     }
 
-    private Flux<String> sendVolumeMessage(MessageCreateEvent event, AudioPlayerGuildData audioPlayerGD) {
+    private Flux<String> sendVolumeMessage(MessageCreateEvent event, AudioPlayerData audioPlayerGD) {
         return Flux.defer(() -> {
             createMessageAndSend(event.getMessage().getChannel(), "Volume is set to {0}", audioPlayerGD.getPlayer().getVolume());
             return Flux.empty();
