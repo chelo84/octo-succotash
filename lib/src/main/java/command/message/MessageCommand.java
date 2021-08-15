@@ -1,7 +1,10 @@
-package command;
+package command.message;
 
-import event.annotation.OnMessage;
+import command.CommandValidationException;
+import command.WrongParameterTypeException;
+import command.WrongReturnTypeException;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import event.annotation.OnMessage;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -25,15 +28,16 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 @Builder
 @ToString
 @RequiredArgsConstructor
-public class Command {
+public class MessageCommand {
 
     String command;
     Class<? extends CommandService> service;
     Method method;
     String description;
     String example;
+    Class<?>[] parameterTypes;
 
-    public static Command create(CommandService service, Method method) {
+    public static MessageCommand create(CommandService service, Method method) {
         OnMessage onMessage = method.getAnnotation(OnMessage.class);
         if (onMessage == null)
             return null;
@@ -43,15 +47,17 @@ public class Command {
         final String commandValue = onMessage.value().trim();
         final String commandDescription = isNotBlank(onMessage.description()) ? onMessage.description() : null;
         final String commandExample = createExample(onMessage);
+        final Class<?>[] parameterTypes = method.getParameterTypes();
 
         validateCommand(service, method, commandValue);
 
-        return Command.builder()
+        return MessageCommand.builder()
                 .command(commandValue)
                 .service(service.getClass())
                 .method(method)
                 .description(commandDescription)
                 .example(isNotBlank(commandExample) ? commandExample : null)
+                .parameterTypes(parameterTypes)
                 .build();
     }
 
@@ -91,7 +97,7 @@ public class Command {
      * @return String containing the command's example
      */
     private static String createExample(OnMessage onMessageAnn) {
-        StringBuilder sb = new StringBuilder(format("{0}{1}", Commands.COMMAND_PREFIX, onMessageAnn.value()));
+        StringBuilder sb = new StringBuilder(format("{0}{1}", MessageCommands.COMMAND_PREFIX, onMessageAnn.value()));
 
         Arrays.stream(onMessageAnn.args())
                 .filter(Objects::nonNull)
@@ -108,8 +114,8 @@ public class Command {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Command command1 = (Command) o;
-        return getCommand().equals(command1.getCommand());
+        MessageCommand messageCommand1 = (MessageCommand) o;
+        return getCommand().equals(messageCommand1.getCommand());
     }
 
     @Override

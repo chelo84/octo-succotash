@@ -1,8 +1,10 @@
 package command;
 
-import event.annotation.OnMessage;
-import event.annotation.MessageArgument;
+import command.message.MessageCommand;
+import command.message.MessageCommands;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import event.annotation.MessageArgument;
+import event.annotation.OnMessage;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 import static event.annotation.MessageArgument.ArgType.TEXT;
 
 @Slf4j
-public class OtherCommands implements CommandService {
+public class CoreMessageCommands implements CommandService {
 
     @OnMessage(
             value = "ping",
@@ -33,17 +35,17 @@ public class OtherCommands implements CommandService {
             description = "Commands info"
     )
     public Mono<?> help(MessageCreateEvent event, Flux<String> arguments) {
-        Set<Command> commands = Commands.getInstance().getCommands();
+        Set<MessageCommand> messageCommands = MessageCommands.getInstance().getMessageCommands();
         return arguments.collectList()
                 .flatMap(args -> {
                     if (args.isEmpty()) {
                         return event.getMessage().getChannel()
-                                .flatMap(channel -> channel.createMessage(spec -> spec.setContent("Commands: " + commands.stream()
-                                        .map(Command::getCommand)
+                                .flatMap(channel -> channel.createMessage(spec -> spec.setContent("Commands: " + messageCommands.stream()
+                                        .map(MessageCommand::getCommand)
                                         .collect(Collectors.joining(", "))
                                 )));
                     } else {
-                        Optional<Command> command = commands.parallelStream()
+                        Optional<MessageCommand> command = messageCommands.parallelStream()
                                 .filter(c -> c.getCommand().equalsIgnoreCase(args.get(0)))
                                 .findFirst();
                         if (command.isEmpty())
@@ -52,9 +54,9 @@ public class OtherCommands implements CommandService {
                         return event.getMessage().getChannel()
                                 .flatMap(channel -> channel.createEmbed(spec ->
                                         spec.setTitle("Command info")
-                                                .addField("Command", command.map(Command::getCommand).orElse("No name"), true)
-                                                .addField("Description", command.map(Command::getDescription).orElse("No description"), false)
-                                                .addField("Example", command.map(Command::getExample).orElse("No example"), false)
+                                                .addField("Command", command.map(MessageCommand::getCommand).orElse("No name"), true)
+                                                .addField("Description", command.map(MessageCommand::getDescription).orElse("No description"), false)
+                                                .addField("Example", command.map(MessageCommand::getExample).orElse("No example"), false)
                                                 .setFooter("<> required | () optional", null)
                                                 .setTimestamp(Instant.now()))
                                 );

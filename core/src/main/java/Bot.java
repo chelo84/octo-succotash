@@ -1,4 +1,4 @@
-import command.Commands;
+import command.message.MessageCommands;
 import discord4j.core.DiscordClient;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -18,7 +18,7 @@ public class Bot {
         final DiscordClient client = DiscordClient.create(token);
 
         client.withGateway(gateway -> {
-            Commands.registerCommands(gateway);
+            MessageCommands.registerCommands(gateway);
 
             return Mono.empty();
         }).block();

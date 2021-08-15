@@ -2,11 +2,11 @@ package command;
 
 import audio.track.TrackScheduler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import event.annotation.OnMessage;
-import event.annotation.MessageArgument;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Member;
 import discord4j.voice.VoiceConnection;
+import event.annotation.MessageArgument;
+import event.annotation.OnMessage;
 import guild.AudioPlayerGuildData;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,7 +18,7 @@ import static event.annotation.MessageArgument.ArgType.INTEGER;
 import static event.annotation.MessageArgument.ArgType.TEXT;
 import static util.MessageUtils.createMessageAndSend;
 
-public class AudioPlayerCommands implements CommandService {
+public class AudioPlayerMessageCommands implements CommandService {
 
     @OnMessage(
             value = "join",

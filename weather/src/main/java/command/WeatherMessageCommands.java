@@ -1,10 +1,10 @@
 package command;
 
-import event.annotation.OnMessage;
-import event.annotation.MessageArgument;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.rest.util.Color;
+import event.annotation.MessageArgument;
+import event.annotation.OnMessage;
 import lombok.extern.slf4j.Slf4j;
 import openweather.OpenWeatherApiError;
 import openweather.OpenWeatherApiResponse;
@@ -24,7 +24,7 @@ import static java.text.MessageFormat.format;
 import static org.apache.logging.log4j.util.Strings.EMPTY;
 
 @Slf4j
-public class WeatherCommands implements CommandService {
+public class WeatherMessageCommands implements CommandService {
 
     private final String API_URL = "http://api.openweathermap.org";
     private final BiConsumer<OpenWeatherApiResponse, EmbedCreateSpec> template = (resp, spec) -> {
